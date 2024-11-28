@@ -1,50 +1,78 @@
 import 'dart:async';
 
+import 'package:data/contracts/exceptions/app_exception.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:presentation/injectors/injectable.dart';
+import 'package:presentation/widgets/dialogs/all.dart';
+
+abstract class _IBaseScreen {
+  void toggleLoading(bool value, {bool showSpinner = false});
+  void showErrorDialog(Object error, StackTrace stackTrace);
+  void showErrorDialogByAppException(AppException exception);
+  void showSnackBar(String message,
+      {Duration? duration,
+      Color? color,
+      Color? textColor,
+      EdgeInsetsGeometry? margin,
+      EdgeInsetsGeometry? padding});
+
+  void showUnderDevelopmentDialog();
+
+  toggleAppDialog();
+
+  Future<void> showDialog({
+    required String title,
+    Widget? content,
+    String? message,
+    String? oKText,
+  });
+
+  Future<bool> showConfirmDialog(
+      {required String title,
+      Widget? content,
+      String? message,
+      String? oKText,
+      String? cancelText});
+
+  void hideKeyBoard(BuildContext context);
+
+  Future<U?> showModalBottomSheet<U>(
+      Widget Function(BuildContext context) builder);
+
+  void copyTextToClipboard(String text);
+}
 
 abstract class BaseScreenState<T extends StatefulWidget> extends State<T>
-    with AutomaticKeepAliveClientMixin<T> {
-
-  GoRouter get router => GoRouter.of(context);
-
+    with AutomaticKeepAliveClientMixin<T>
+    implements _IBaseScreen {
   @override
   // ignore: must_call_super
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: onWillPop,
+    return PopScope(
+      canPop: _canPop,
+      onPopInvokedWithResult: (didPop, result) {},
       child: builder(context),
     );
   }
+
+  AppDialogManager get _appDialogManager => getIt<AppDialogManager>();
+
+  bool get _canPop => ModalRoute.of(context)?.canPop ?? false;
 
   Widget builder(BuildContext context);
 
   @override
   bool get wantKeepAlive => false;
 
-  bool get willPop => true;
-
-  ///   Override this function to handle will pop scope in case
-  ///   you need to custom it
-  bool onPhysicalBackPress() {
-    return willPop;
-  }
-
-  Future<bool> onWillPop() {
-    return Future.value(onPhysicalBackPress());
-  }
-
-  void toggleAppDialog(bool isShow, {required dynamic dialogBuilder}) {}
-
+  @override
   void toggleLoading(bool value, {bool showSpinner = false}) {}
 
-  void showErrorDialog(Object error) {}
-
+  @override
   void hideKeyBoard(BuildContext context) {
     if (FocusScope.of(context).hasFocus) {
       FocusScope.of(context).unfocus();
     }
   }
+
+  //TODO: Custom toggle dialogs here
 }
-
-

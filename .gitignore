@@ -26,3 +26,8 @@ doc/api/
 .flutter-plugins
 .flutter-plugins-dependencies
 .DS_Store
+
+# FVM Version Cache
+.fvm/
+launch.json
+settings.json

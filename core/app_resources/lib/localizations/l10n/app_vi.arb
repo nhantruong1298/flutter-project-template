@@ -1,0 +1,16 @@
+{
+  "hello": "Hello {userName}!",
+  "@hello": {
+    "description": "A message with a single parameter",
+    "placeholders": {
+      "userName": {
+        "type": "String",
+        "example": "Bob"
+      }
+    }
+  },
+  "commonOkButton": "OK",
+  "commonCancelButton": "Cancel",
+  "commonErrorTitleText": "Error"
+
+}

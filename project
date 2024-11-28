@@ -8,6 +8,7 @@ runScript(){
     cd $appDir"/core/presentation" && echoInfo "Execute commands in Presentation" && executeCommands
     cd $appDir"/core/data" && echoInfo "Execute commands in Data" && executeCommands
     cd $appDir"/core/domain" && echoInfo "Execute commands in Domain" && executeCommands
+    cd $appDir"/core/app_resources" && echoInfo "Execute commands in App Resources" && executeCommands
 }
 
 executeCommands(){
@@ -30,23 +31,23 @@ executeCommands(){
 
 executeGenerate(){
   echoCommandInfo "AUTO GENERATED CLASS"
-  flutter packages pub run build_runner build --delete-conflicting-outputs
+  fvm flutter packages pub run build_runner build --delete-conflicting-outputs
 }
 
 executeGetPackages(){
   echoCommandInfo "AUTO GET PACKAGES"
-  flutter pub get
+  fvm flutter pub get
 }
 
 executeCleanPackages() {
   echoCommandInfo "AUTO CLEAN PACKAGES"
-  flutter clean
+  fvm flutter clean
 }
 
 
 executeUpgradePackages() {
   echoCommandInfo "AUTO UPGRADE PACKAGES"
-  flutter pub upgrade
+  fvm flutter pub upgrade
 }
 
 echoInfo(){

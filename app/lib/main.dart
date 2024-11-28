@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:sample/my_app.dart';
+import 'package:core/app_core.dart';
+import 'package:sample/app_config.dart';
 
-void main() {
-  MyApp.initConfig();
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await AppCore.initConfig(AppConfigProviderImpl(
+      serviceConfigProvider: const ServiceConfigProviderImpl(
+    apiEndPoint: '',
+    environment: '',
+    webUrl: '',
+  )));
+  
+  runApp(AppCore.buildApplication());
 }

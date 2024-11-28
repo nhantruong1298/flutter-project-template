@@ -1,70 +1,45 @@
 name: presentation
 description: presentation layer
 version: 0.0.1
-publish_to: 'none'
+publish_to: "none"
 
 environment:
-  sdk: '>=2.19.6 <3.0.0'
+  sdk: ">=3.0.0 <4.0.0"
   flutter: ">=1.17.0"
 
 dependencies:
   flutter:
-    sdk: flutter
-  flutter_localizations:
     sdk: flutter
 
   data:
     path: ../data
   domain:
     path: ../domain
-  go_router: ^6.2.0
+  app_resources:
+    path: ../app_resources
   flutter_bloc: ^8.1.2
   equatable: ^2.0.5
-  get_it: ^7.2.0
-  freezed_annotation: ^2.2.0
-  json_annotation: ^4.8.0
-  intl: ^0.17.0
-
+  get_it: ^8.0.2
+  # freezed_annotation: ^2.2.0
+  # json_annotation: ^4.8.0
+  auto_route: ^9.2.2
+  injectable: ^2.5.0
+  flutter_screenutil: ^5.9.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
-  freezed: ^2.3.2
+  # freezed: ^2.3.2
   build_runner: ^2.3.3
-  json_serializable: ^6.6.1
-  flutter_gen_runner: ^5.3.0
-  go_router_builder: ^1.2.1
+  # json_serializable: ^6.6.1
+  # flutter_gen_runner: ^5.3.0
+  auto_route_generator:
+  injectable_generator:   
 
 
-# Config flutter_gen
-# https://pub.dev/packages/flutter_gen
-flutter_gen:
-  null_safety: true # Optional (default: true)
-  output: lib/generated/ # Optional (default: lib/gen/)
-  integrations:
-    flutter_svg: true
-  assets:
-    outputs:
-      enable: true
-      package_parameter_enabled: true
-
-# Config Intl
-# https://docs.flutter.dev/accessibility-and-localization/internationalization
-flutter_intl:
-  enabled: true
-  class_name: S
-  main_locale: vi
-  arb_dir: lib/l10n
-  output_dir: lib/generated/
-  use_deferred_loading: false
-
-
-
-
-flutter:
-  assets:
-    - assets/images/
+# flutter:
+#   assets:
   #
   # For details regarding assets in packages, see
   # https://flutter.dev/assets-and-images/#from-packages

@@ -9,8 +9,8 @@ class ErrorDataMapper {
     if (responseData == null ||
         (responseData is String && responseData.isEmpty)) {
       return BusinessException(
-        businessExceptionCode: BusinessExceptionCode.UNEXPECTED_ERROR,
-        debugMessage: UNKNOWN_ERROR_MESSAGE,
+        exceptionCode: BusinessExceptionCode.UNEXPECTED_ERROR,
+        message: UNKNOWN_ERROR_MESSAGE,
         originalException: error,
       );
     }
@@ -18,7 +18,7 @@ class ErrorDataMapper {
     //TODO: Custom API error here
 
     return BusinessException(
-      businessExceptionCode: BusinessExceptionCode.UNEXPECTED_ERROR,
+      exceptionCode: BusinessExceptionCode.UNEXPECTED_ERROR,
     );
   }
 }

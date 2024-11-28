@@ -1,16 +1,15 @@
 name: domain
 description: Domain layer
 version: 0.0.1
-publish_to: 'none'
+publish_to: "none"
 
 environment:
-  sdk: '>=2.19.6 <3.0.0'
+  sdk: ">=3.0.0 <4.0.0"
   flutter: ">=1.17.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  dio: ^5.1.2
 
 dev_dependencies:
   flutter_lints: ^2.0.0

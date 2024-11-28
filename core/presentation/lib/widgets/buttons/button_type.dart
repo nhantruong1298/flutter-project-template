@@ -1,0 +1,4 @@
+enum AppButtonType {
+  rounded,
+  primary,
+}

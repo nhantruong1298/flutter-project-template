@@ -1,7 +1,0 @@
-class SampleResult{
-  
-}
-
-class SampleParams{
-  
-}
