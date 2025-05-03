@@ -1,7 +1,8 @@
 import 'package:app_resources/app_resources.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:presentation/app/auto_route_config.dart';
-
+import 'package:presentation/widgets/dialogs/all.dart';
 
 class Application extends StatefulWidget {
   const Application({super.key});
@@ -22,17 +23,28 @@ class _ApplicationState extends State<Application> {
   final _appRoute = AppRouter();
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      AppDialogManager.instance.setNavigatorKey(_appRoute.navigatorKey);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      routerConfig: _appRoute.config(),
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      builder: (context, child) {
-        AppScheme.configure(context);
-        AppResource.preCacheImageAssets(context);
-        return child!;
-      },
+    return ScreenUtilInit(
+      child: MaterialApp.router(
+        debugShowCheckedModeBanner: false,
+        routerConfig: _appRoute.config(),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        builder: (context, child) {
+          AppScheme.configure(context);
+          AppResource.preCacheImageAssets(context);
+
+          return child!;
+        },
+      ),
     );
   }
 }

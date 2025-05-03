@@ -16,6 +16,7 @@ class AlertDialogBuilder extends AppDialogBuilder {
   final Widget? contentBuilder;
   final AppButtonType? buttonType;
   final bool fullButtonWidth;
+  final VoidCallback? onTapOutside;
   final GlobalKey<AppDialogWidgetState> _dialogKey =
       GlobalKey<AppDialogWidgetState>();
 
@@ -30,6 +31,7 @@ class AlertDialogBuilder extends AppDialogBuilder {
     this.buttonType,
     this.fullButtonWidth = false,
     this.onOk,
+    this.onTapOutside,
   });
 
   @override
@@ -62,6 +64,7 @@ class AlertDialogBuilder extends AppDialogBuilder {
       onCloseButtonPress: () {
         onClose?.call();
       },
+      onTapOutside: onTapOutside,
     );
   }
 }

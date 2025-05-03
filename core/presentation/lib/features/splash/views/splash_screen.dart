@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:presentation/base/base_screen.dart';
 import 'package:presentation/widgets/layouts/basic_layout.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -8,9 +9,10 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends BaseScreenState<SplashScreen> {
+
   @override
-  Widget build(BuildContext context) {
+  Widget builder(BuildContext context) {
     return BasicLayout();
   }
 }

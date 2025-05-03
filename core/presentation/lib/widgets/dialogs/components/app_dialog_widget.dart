@@ -128,28 +128,33 @@ class AppDialogWidgetState extends State<AppDialogWidget>
   Widget buildContent() {
     return Stack(
       children: [
-        Container(
-          // margin: getDialogOuterMargin(),
-          decoration: const BoxDecoration(
-            color: Colors.white,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              _buildInnerImage(),
-              Container(
-                // padding: getDialogInnerPadding(),
-                child: Column(
-                  children: <Widget>[
-                    _buildTittle(),
-                    _buildMessage(),
-                    _buildCustomWidget(),
-                    _buildBottomButtons(),
-                  ],
+        TapRegion(
+          onTapOutside: (_) {
+            widget.onTapOutside?.call();
+          },
+          child: Container(
+            // margin: getDialogOuterMargin(),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                _buildInnerImage(),
+                Container(
+                  // padding: getDialogInnerPadding(),
+                  child: Column(
+                    children: <Widget>[
+                      _buildTittle(),
+                      _buildMessage(),
+                      _buildCustomWidget(),
+                      _buildBottomButtons(),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
         Positioned.fill(
@@ -166,7 +171,6 @@ class AppDialogWidgetState extends State<AppDialogWidget>
             alignment: Alignment.topRight,
             child: GestureDetector(
               onTap: () {
-                forceHideDialog();
                 widget.onCloseButtonPress?.call();
               },
               child: Container(
@@ -321,7 +325,6 @@ class AppDialogWidgetState extends State<AppDialogWidget>
           child: Text(AppLocalizations.of(context)!.commonCancelButton),
         ),
         onPressed: () {
-          forceHideDialog();
           widget.onCloseButtonPress?.call();
         },
       ),
@@ -340,7 +343,6 @@ class AppDialogWidgetState extends State<AppDialogWidget>
       onTap: dialogButton.disabled
           ? null
           : () {
-              forceHideDialog();
               dialogButton.onButtonClick?.call();
             },
 
@@ -354,17 +356,7 @@ class AppDialogWidgetState extends State<AppDialogWidget>
     if (widget.buttonDirection == DialogButtonDirection.VERTICAL) {
       return button;
     }
-    return dialogButton.minWidth != null
-        ? button
-        : Expanded(
-            flex: 1,
-            child: button,
-          );
-  }
-
-  void forceHideDialog() {
-    // getIt<AppDialogManager>().forceHideDialog();
-    // Navigator.of(context, rootNavigator: true).pop();
+    return dialogButton.minWidth != null ? button : button;
   }
 }
 
@@ -388,6 +380,7 @@ class AppDialogWidget extends StatefulWidget {
     this.dialogPadding,
     this.fullButtonWidth = false,
     this.additionalButton,
+    this.onTapOutside,
   });
   final EdgeInsets? dialogPadding;
   final DialogIconStyle iconStyle;
@@ -403,6 +396,7 @@ class AppDialogWidget extends StatefulWidget {
   final bool animated;
   final bool fullButtonWidth;
   final List<DialogButton>? additionalButton;
+  final VoidCallback? onTapOutside;
 }
 
 class DialogButton {

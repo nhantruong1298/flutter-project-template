@@ -3,6 +3,7 @@ import 'auto_route_config.gr.dart';
 
 @AutoRouterConfig(replaceInRouteName: 'Screen|Module,Route')
 class AppRouter extends RootStackRouter {
+  
   @override
   List<AutoRoute> get routes => [
         // AutoRoute(

@@ -24,6 +24,6 @@ _i174.GetIt init(
     environment,
     environmentFilter,
   );
-  gh.singleton<_i129.AppDialogManager>(() => _i129.AppDialogManager());
+  gh.singleton<_i129.AppDialogManagerImpl>(() => _i129.AppDialogManagerImpl());
   return getIt;
 }

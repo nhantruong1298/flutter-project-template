@@ -3,8 +3,6 @@ import 'dart:async';
 import 'package:app_resources/app_resources.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:injectable/injectable.dart';
-import 'package:presentation/widgets/buttons/button_type.dart';
 import 'package:presentation/widgets/dialogs/components/app_dialog_widget.dart';
 
 import 'components/alert_dialog.dart';
@@ -12,42 +10,42 @@ import 'components/confirm_dialog.dart';
 import 'components/error_dialog.dart';
 
 abstract class AppDialogBuilder {
-  /// @code to identify the dialog, help the dialog manager
-  /// to recognize the correct dialog for showing and hiding correctly
-  /// in case the screen contain multiple same dialog types
-  int code = 0;
-  bool barrierDismissible = false;
-
-  Widget buildDialog(
-    Key key,
-    BuildContext context,
-  );
-
-  AppDialogBuilder withCode(int code) {
-    this.code = code;
-    return this;
-  }
+  Widget buildDialog(Key key, BuildContext context);
 }
 
-@Singleton()
-class AppDialogManager {
+abstract class AppDialogManager {
+  static final AppDialogManager instance = AppDialogManagerImpl();
+
+  setNavigatorKey(GlobalKey<NavigatorState> navKey);
+
+  Future<void> showAlertDialog({
+    required String title,
+    Widget? content,
+    String? oKText,
+  });
+  Future<bool> showConfirmDialog({
+    String? title,
+    Widget? content,
+    String? oKText,
+    String? cancelText,
+  });
+  Future<dynamic> showDialog({required AppDialogBuilder appDialogBuilder});
+}
+
+class AppDialogManagerImpl implements AppDialogManager {
   AppDialogBuilder? _currentDialogBuilder;
 
-  final GlobalKey<AppDialogWidgetState> _dialogKey =
-      GlobalKey<AppDialogWidgetState>();
+  final _dialogKey = GlobalKey<AppDialogWidgetState>();
 
   GlobalKey<NavigatorState>? _navKey;
 
-  AppDialogManager();
+  BuildContext? get _dialogOverlayContext => _navKey?.currentState?.context;
 
-  bool get isShowingDialog {
-    return _currentDialogBuilder != null;
-  }
+  OverlayEntry? _dialogOverlay;
 
-  BuildContext? get dialogOverlayContext => _navKey?.currentState?.context;
-
-  void dispose() {
-    _currentDialogBuilder = null;
+  @override
+  setNavigatorKey(GlobalKey<NavigatorState> navKey) {
+    _navKey = navKey;
   }
 
   void forceHideDialog() {
@@ -63,53 +61,30 @@ class AppDialogManager {
       return;
     }
 
-    if (dialogBuilder.code != _currentDialogBuilder!.code) {
-      return;
-    }
     forceHideDialog();
   }
 
-  void registerNavigatorKey(GlobalKey<NavigatorState> navKey) {
-    _navKey = navKey;
-  }
-
-  Future<bool> showAlertDialog({
-    required String title,
-    Widget? content,
-    Widget? image,
-    String? oKText,
-    String? message,
-    AppButtonType? buttonType,
-    String? cancelText,
-  }) async {
-    Completer<bool> completer = Completer<bool>();
-
-    toggleDialog(
-      true,
-      appDialogBuilder: AlertDialogBuilder(
-          title: title,
-          contentBuilder: content,
-          message: message,
-          onCancel: () {
-            forceHideDialog();
-            completer.complete(false);
-          },
-          onClose: () {
-            forceHideDialog();
-            completer.complete(false);
-          },
-          positiveText: oKText,
-          buttonType: buttonType,
-          negativeText: cancelText,
-          onOk: () {
-            forceHideDialog();
-            completer.complete(true);
-          }),
-    );
+  @override
+  Future<void> showAlertDialog(
+      {required String title, Widget? content, String? oKText}) async {
+    final completer = Completer<void>();
+    toggleDialog(true,
+        appDialogBuilder: AlertDialogBuilder(
+            title: title,
+            contentBuilder: content,
+            positiveText: oKText,
+            onOk: () {
+              forceHideDialog();
+              completer.complete();
+            },
+            onTapOutside: () {
+              forceHideDialog();
+            }));
 
     return completer.future;
   }
 
+  @override
   Future<bool> showConfirmDialog({
     String? title,
     Widget? content,
@@ -127,8 +102,6 @@ class AppDialogManager {
         title: title,
         contentBuilder: content,
         message: message,
-        // dialogButtonDirection:
-        //     dialogButtonDirection ?? DialogButtonDirection.HORIZONTAL,
         image: image,
         onCancel: () {
           forceHideDialog();
@@ -140,30 +113,10 @@ class AppDialogManager {
         },
         positiveText: oKText,
         negativeText: cancelText,
-        // additionalButton: additionalButton?.map(
-        //   (e) {
-        //     return DialogButton(
-        //       buttonText: e.buttonText,
-        //       buttonType: e.buttonType,
-        //       minWidth: AppDimensions.buttonMinimalWidth,
-        //       onButtonClick: () {
-        //         e.onButtonClick?.call();
-        //         forceHideDialog();
-        //         completer.complete(true);
-        //       },
-        //     );
-        //   },
-        // ).toList(),
       ),
     );
 
     return completer.future;
-  }
-
-  Future<dynamic> showDialog(
-      {required AppDialogBuilder appDialogBuilder}) async {
-    _currentDialogBuilder = appDialogBuilder;
-    return _createAndInsertDialogOverlay(dialogOverlayContext!);
   }
 
   Future<dynamic> showErrorDialog(BuildContext context, Exception exception) {
@@ -178,27 +131,33 @@ class AppDialogManager {
             }));
   }
 
-  toggleDialog(bool isShow, {AppDialogBuilder? appDialogBuilder}) {
+  Future<dynamic> toggleDialog(bool isShow,
+      {AppDialogBuilder? appDialogBuilder}) {
     if (isShow) {
       assert(appDialogBuilder != null);
       return showDialog(appDialogBuilder: appDialogBuilder!);
     }
-    return hideDialog(dialogBuilder: appDialogBuilder ?? _currentDialogBuilder);
+
+    hideDialog(dialogBuilder: appDialogBuilder ?? _currentDialogBuilder);
+    return Future.value();
   }
 
-  Widget _buildDialogContent(BuildContext context) {
-    if (_currentDialogBuilder != null) {
-      return SizedBox(
-        width: double.infinity,
-        height: double.infinity,
-        child: _currentDialogBuilder!.buildDialog(_dialogKey, context),
-      );
+  @override
+  Future<dynamic> showDialog(
+      {required AppDialogBuilder appDialogBuilder}) async {
+    _currentDialogBuilder = appDialogBuilder;
+    return _createAndInsertDialogOverlay(_dialogOverlayContext!);
+  }
+
+  Future<dynamic> _createAndInsertDialogOverlay(BuildContext context) async {
+    if (_currentDialogBuilder == null) {
+      return;
     }
-
-    return Container();
+    FocusScope.of(context).requestFocus(FocusNode());
+    _removeDialogOverlay();
+    _dialogOverlay = _createOverlayEntry();
+    _insertDialogOverlay(_dialogOverlay);
   }
-
-  OverlayEntry? _dialogOverlay;
 
   void _removeDialogOverlay() {
     if (_dialogOverlay != null) {
@@ -217,21 +176,30 @@ class AppDialogManager {
         top: 0,
         width: screenWidth,
         height: screenHeight,
-        child: Material(
-          color: Colors.transparent,
-          child: _buildDialogContent(context),
-        ),
+        child: _buildDialogContent(context),
       ),
     );
   }
 
-  Future<dynamic> _createAndInsertDialogOverlay(BuildContext context) async {
-    if (_currentDialogBuilder == null) {
-      return;
+  void _insertDialogOverlay(OverlayEntry? overlay) {
+    if (overlay != null) {
+      _navKey?.currentState?.overlay?.insert(_dialogOverlay!);
     }
-    FocusScope.of(context).requestFocus(FocusNode());
-    _removeDialogOverlay();
-    _dialogOverlay = _createOverlayEntry();
-    Overlay.of(context).insert(_dialogOverlay!);
+  }
+
+  Widget _buildDialogContent(BuildContext context) {
+    if (_currentDialogBuilder != null) {
+      return SizedBox(
+        width: double.infinity,
+        height: double.infinity,
+        child: _currentDialogBuilder!.buildDialog(_dialogKey, context),
+      );
+    }
+
+    return Container();
+  }
+
+  void dispose() {
+    _currentDialogBuilder = null;
   }
 }
